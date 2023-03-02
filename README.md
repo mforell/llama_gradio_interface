@@ -32,6 +32,12 @@ Different models require different MP values:
 | 33B    | 4  |
 | 65B    | 8  |
 
+### Gradio Interface
+Use the gradio demo to play around with inference in an interactive way. Make sure to change the model paths in app.py.
+```
+torchrun --nproc_per_node 1 app.py
+```
+This demo requires ~16GB GPU memory, but could also run on CPU if you adapt a few lines. 
 
 ### Model Card
 See [MODEL_CARD.md](MODEL_CARD.md)

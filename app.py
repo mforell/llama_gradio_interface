@@ -17,7 +17,6 @@ generator = load(ckpt_dir="./models/7B", tokenizer_path="./models/tokenizer.mode
 def generate_text(text):
     yield from generator.generate_rolling(text, max_gen_len=1024)
 
-
 examples = [
     ["The capital of Germany is the city of"],
     ["Here is my sonnet in the style of Shakespeare about an artificial intelligence:"]
