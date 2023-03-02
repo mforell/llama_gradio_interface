@@ -12,10 +12,11 @@ initialize_model_parallel(world_size)
 torch.cuda.set_device(local_rank)
 torch.manual_seed(1)
 
-generator = load(ckpt_dir="./models/7B", tokenizer_path="./models/tokenizer.model", local_rank=0, world_size=1)
+generator = load(ckpt_dir="./models/7B", tokenizer_path="./models/tokenizer.model", local_rank=local_rank, world_size=world_size)
 
 def generate_text(text):
-    yield from generator.generate_rolling(text, max_gen_len=1024)
+    yield from generator.generate_rolling(text, max_gen_len=512)
+
 
 examples = [
     ["The capital of Germany is the city of"],

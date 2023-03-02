@@ -46,6 +46,8 @@ class LLaMA:
             )
             tokens[:, cur_pos] = next_token
             prev_pos = cur_pos
+            if next_token.item() == self.tokenizer.eos_id:
+                break
             yield self.tokenizer.decode(tokens[0,:cur_pos].tolist())
 
         t = tokens[0, : len(prompt_tokens) + max_gen_len].tolist()
