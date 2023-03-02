@@ -14,6 +14,48 @@ class LLaMA:
         self.model = model
         self.tokenizer = tokenizer
 
+    def generate_rolling(
+            self,
+            prompt: str,
+            max_gen_len: int,
+            temperature: float = 0.8,
+            top_p: float = 0.95,
+    ):
+        """Generate text and yield each token as it is generated."""
+        params = self.model.params
+        prompt_tokens = self.tokenizer.encode(prompt, bos=True, eos=False)
+        min_prompt_size = len(prompt_tokens)
+        total_len = min(params.max_seq_len, max_gen_len + min_prompt_size)
+
+        tokens = torch.full((1, total_len), self.tokenizer.pad_id).cuda().long()
+        tokens[0, : min_prompt_size] = torch.tensor(prompt_tokens).long()
+        input_text_mask = tokens != self.tokenizer.pad_id
+        start_pos = min_prompt_size
+        prev_pos = 0
+        for cur_pos in range(start_pos, total_len):
+            logits = self.model.forward(tokens[:, prev_pos:cur_pos], prev_pos)
+            if temperature > 0:
+                probs = torch.softmax(logits / temperature, dim=-1)
+                next_token = sample_top_p(probs, top_p)
+            else:
+                next_token = torch.argmax(logits, dim=-1)
+            next_token = next_token.reshape(-1)
+            # only replace token if prompt has already been generated
+            next_token = torch.where(
+                input_text_mask[:, cur_pos], tokens[:, cur_pos], next_token
+            )
+            tokens[:, cur_pos] = next_token
+            prev_pos = cur_pos
+            yield self.tokenizer.decode(tokens[0,:cur_pos].tolist())
+
+        t = tokens[0, : len(prompt_tokens) + max_gen_len].tolist()
+        # cut to eos tok if any
+        try:
+            t = t[: t.index(self.tokenizer.eos_id)]
+        except ValueError:
+            pass
+        yield self.tokenizer.decode(t)
+
     def generate(
         self,
         prompts: List[str],
