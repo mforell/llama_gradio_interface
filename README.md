@@ -37,7 +37,9 @@ Use the gradio demo to play around with inference in an interactive way. Make su
 ```
 torchrun --nproc_per_node 1 app.py
 ```
-This demo requires ~16GB GPU memory, but could also run on CPU if you adapt a few lines. 
+This demo requires ~16GB GPU memory, but could also run on CPU if you adapt a few lines. See this example for the app in use:
+
+https://user-images.githubusercontent.com/32109055/222568019-44f590ae-724f-4b51-848e-5273fdfe16e2.mp4
 
 ### Model Card
 See [MODEL_CARD.md](MODEL_CARD.md)
