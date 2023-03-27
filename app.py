@@ -3,7 +3,7 @@ from example import load
 import torch
 import os
 from fairscale.nn.model_parallel.initialize import initialize_model_parallel
-
+_path = "/data/models/llama/"
 local_rank = int(os.environ.get("LOCAL_RANK", -1))
 world_size = int(os.environ.get("WORLD_SIZE", -1))
 
@@ -12,7 +12,24 @@ initialize_model_parallel(world_size)
 torch.cuda.set_device(local_rank)
 torch.manual_seed(1)
 
-generator = load(ckpt_dir="./models/7B", tokenizer_path="./models/tokenizer.model", local_rank=local_rank, world_size=world_size)
+model_selection = input("Please enter the model you want to use: 7B, 13B, 30B ")
+modelpath = ""
+
+while not modelpath:
+    if model_selection == "7B":
+        modelpath = _path + "llama-7B"
+    elif model_selection == "13B":
+        modelpath =  _path + "llama-13B"
+    elif model_selection == "30B":
+        modelpath = _path + "llama-30B"
+    else:
+        print("Invalid model selection.")
+        model_selection = input("Please enter the model you want to use: 7B, 13B, 30B ")
+
+if modelpath:
+    print("You have chosen " + model_selection + " and the modelpath is " + modelpath + ".")
+
+generator = load(ckpt_dir=modelpath+"/models/" + model_selection , tokenizer_path=modelpath+"/models/tokenizer.model", local_rank=local_rank, world_size=world_size)
 
 def generate_text(text):
     yield from generator.generate_rolling(text, max_gen_len=512)
