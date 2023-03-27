@@ -12,7 +12,7 @@ initialize_model_parallel(world_size)
 torch.cuda.set_device(local_rank)
 torch.manual_seed(1)
 
-model_selection = input("Please enter the model you want to use: 7B, 13B, 30B ")
+model_selection = input("Please enter the model you want to use: 7B, 13B, 30B: \n ")
 modelpath = ""
 
 while not modelpath:
@@ -63,7 +63,7 @@ gr.Interface(
     generate_text,
     "textbox",
     "text",
-    title="LLama 7B",
-    description="LLama-7B large language model.",
+    title=f"LLama {model_selection}",
+    description= f"LLama-{model_selection} large language model.",
     examples=examples
 ).queue().launch()
